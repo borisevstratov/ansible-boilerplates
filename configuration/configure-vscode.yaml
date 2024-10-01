@@ -1,0 +1,11 @@
+---
+- name: Preparing for VSCode server installation
+  hosts: all
+  become: yes
+  tasks:
+    - name: Append configuration in /etc/sysctl.conf
+      shell: echo "\nfs.inotify.max_user_watches=524288\n" >> /etc/sysctl.conf
+
+    - name: Apply configuration
+      shell: sysctl -p
+    

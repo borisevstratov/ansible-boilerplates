@@ -1,0 +1,46 @@
+---
+- name: Install GitHub CLI
+  hosts: all
+  become: yes
+  vars_files:
+    - ../.env.yaml
+  tasks:
+    - name: Add GitHub CLI apt key
+      apt_key:
+        url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+
+    - name: Add GitHub CLI apt repository
+      apt_repository:
+        repo: deb [arch=amd64] https://cli.github.com/packages stable main
+        state: present
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install GitHub CLI
+      apt:
+        name: gh
+        state: present
+    
+    - name: Save GitHub token to a file
+      ansible.builtin.copy:
+        content: "{{ GITHUB_PAT }}"
+        dest: ~/.githubtoken
+        mode: '0600'
+
+    - name: Authenticate GitHub CLI with provided PAT
+      ansible.builtin.shell:
+        cmd: gh auth login --with-token < ~/.githubtoken
+
+    - name: Set up credential helper for git
+      command: gh auth setup-git
+
+    - name: Authorize Docker for GitHub Container Registry
+      command: "echo ~/.githubtoken | docker login ghcr.io -u {{ GITHUB_USERNAME }} --password-stdin"
+
+    - name: Remove the temporary file
+      ansible.builtin.file:
+        path: ~/.githubtoken
+        state: absent
+  
