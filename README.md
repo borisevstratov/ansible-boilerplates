@@ -17,6 +17,14 @@ VPS_IP_ADDRESS ansible_user=VPS_USER ansible_ssh_pass=VPS_PASSWORD
 
 5. Specify necessary configs in `.env.yaml` file
 
+## Running playbooks
+
+Execute the following code:
+
+```bash
+ansible-playbook path/to/playbook.yaml
+```
+
 ## Testing connection
 
 ```bash
